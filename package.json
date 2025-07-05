@@ -1,0 +1,30 @@
+{
+  "name": "tutorias-wawita",
+  "version": "1.0.0",
+  "description": "Plataforma de tutorías Wawita - Sistema completo de gestión de cursos y tutorías",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=index.html",
+    "start": "live-server --port=3000 --open=index.html",
+    "build": "echo 'Build completed - static files ready'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "tutorías",
+    "educación",
+    "cursos",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "Wawita Team",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "homepage": "."
+}
