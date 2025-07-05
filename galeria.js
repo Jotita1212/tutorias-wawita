@@ -2,8 +2,64 @@ document.addEventListener('DOMContentLoaded', function () {
     const coursesContainer = document.getElementById('coursesContainer');
     let courses = JSON.parse(localStorage.getItem('cursos')) || [];
   
+    // Verificar autenticación
+    function checkAuth() {
+        const user = sessionStorage.getItem('wawita_user') || localStorage.getItem('wawita_user');
+        if (!user) {
+            showAuthMessage();
+            return false;
+        }
+        return true;
+    }
+    
+    function showAuthMessage() {
+        const authDiv = document.createElement('div');
+        authDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 10000;
+            max-width: 400px;
+        `;
+        authDiv.innerHTML = `
+            <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
+            <h2 style="color: #00796b; margin-bottom: 15px;">Acceso Restringido</h2>
+            <p style="color: #666; margin-bottom: 25px;">
+                Debes iniciar sesión para acceder a la galería de cursos y todas las funcionalidades.
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a href="login.html" style="
+                    padding: 12px 25px;
+                    background: linear-gradient(135deg, #00796b, #004d40);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 25px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                ">Iniciar Sesión</a>
+                <a href="index.html" style="
+                    padding: 12px 25px;
+                    background: #6c757d;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 25px;
+                    font-weight: 500;
+                ">Volver al Inicio</a>
+            </div>
+        `;
+        document.body.appendChild(authDiv);
+    }
+
     // Función para mostrar los cursos en la galería con diseño mejorado
     function renderCourses() {
+        if (!checkAuth()) return;
+        
         coursesContainer.innerHTML = '';
   
         if (courses.length === 0) {
@@ -86,6 +142,8 @@ document.addEventListener('DOMContentLoaded', function () {
   
     // Función para redirigir al formulario de materiales
     window.irAMateriales = function (courseID) {
+        if (!checkAuth()) return;
+        
         // Mostrar loading
         showLoading('Cargando materiales...');
         
@@ -97,6 +155,8 @@ document.addEventListener('DOMContentLoaded', function () {
   
     // Función para redirigir a la página de reuniones
     window.irAReuniones = function (courseID) {
+        if (!checkAuth()) return;
+        
         // Mostrar loading
         showLoading('Accediendo a reuniones...');
         
@@ -108,6 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
   
     // Función para eliminar un curso con confirmación mejorada
     window.eliminarCurso = function (courseID) {
+        if (!checkAuth()) return;
+        
         const course = courses.find(c => c.id === courseID);
         if (!course) return;
         
@@ -259,41 +321,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // Verificar autenticación del usuario
-    function checkAuthentication() {
-        const user = localStorage.getItem('wawita_user') || sessionStorage.getItem('wawita_user');
-        if (!user) {
-            showAuthMessage();
-            return false;
-        }
-        return true;
-    }
-    
-    function showAuthMessage() {
-        const authDiv = document.createElement('div');
-        authDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #f9a825, #e65100);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10000;
-            animation: slideInRight 0.3s ease;
-        `;
-        authDiv.innerHTML = `
-            🔐 Inicia sesión para acceder a todas las funciones
-            <a href="login.html" style="color: white; text-decoration: underline; margin-left: 10px;">Iniciar Sesión</a>
-        `;
-        document.body.appendChild(authDiv);
-
-        setTimeout(() => {
-            authDiv.remove();
-        }, 5000);
-    }
-    
     // Agregar estilos para las animaciones
     const styles = document.createElement('style');
     styles.textContent = `
@@ -326,7 +353,4 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Cargar los cursos al iniciar
     renderCourses();
-    
-    // Verificar autenticación
-    checkAuthentication();
 });

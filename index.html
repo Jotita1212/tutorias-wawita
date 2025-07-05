@@ -23,7 +23,7 @@
         </a>
         <ul>
             <li><a href="index.html">Inicio</a></li>
-            <li><a href="login.html">Iniciar Sesión</a></li>
+            <li id="authMenuItem"><a href="login.html">Iniciar Sesión</a></li>
             <li><a href="pagos.html">Pagos</a></li>
             <li><a href="galeria.html">Galería</a></li>
             <li><a href="postula.html">Postula</a></li>
@@ -32,6 +32,16 @@
             <li><button id="openChatBtn" class="chat-btn">💬 Chat</button></li>
         </ul>
     </nav>
+
+    <!-- Barra de usuario logueado -->
+    <div id="userBar" class="user-bar" style="display: none;">
+        <div class="user-info">
+            <span class="user-avatar">👤</span>
+            <span class="user-name" id="userName">Usuario</span>
+            <span class="user-role" id="userRole">Estudiante</span>
+        </div>
+        <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
+    </div>
 
     <!-- Modal de chat mejorado -->
     <div id="chatModal" class="modal">
@@ -146,5 +156,6 @@
     </footer>
 
     <script src="Racha.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>

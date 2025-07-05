@@ -1,36 +1,66 @@
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const showRegisterForm = document.getElementById('showRegisterForm');
+    const showLoginForm = document.getElementById('showLoginForm');
+
+    // Elementos del formulario de login
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const emailError = document.getElementById('emailError');
     const passwordError = document.getElementById('passwordError');
-    const loginBtn = document.querySelector('.login-btn');
-    const btnText = document.querySelector('.btn-text');
-    const btnLoading = document.querySelector('.btn-loading');
 
-    // Usuarios predefinidos para demostración
-    const users = [
-        { email: 'admin@wawita.es', password: 'admin123', role: 'admin', name: 'Administrador' },
-        { email: 'tutor@wawita.es', password: 'tutor123', role: 'tutor', name: 'Tutor Demo' },
-        { email: 'estudiante@wawita.es', password: 'estudiante123', role: 'student', name: 'Estudiante Demo' },
-        { email: 'demo@wawita.es', password: 'demo123', role: 'demo', name: 'Usuario Demo' }
-    ];
+    // Elementos del formulario de registro
+    const regNameInput = document.getElementById('regName');
+    const regEmailInput = document.getElementById('regEmail');
+    const regPasswordInput = document.getElementById('regPassword');
+    const regConfirmPasswordInput = document.getElementById('regConfirmPassword');
+    const userRoleInput = document.getElementById('userRole');
 
-    // Validación en tiempo real
+    // Cambiar entre formularios
+    showRegisterForm.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        formTitle.textContent = 'Crear Cuenta';
+        formSubtitle.textContent = 'Únete a la comunidad Wawita';
+    });
+
+    showLoginForm.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'block';
+        formTitle.textContent = 'Bienvenido a Wawita';
+        formSubtitle.textContent = 'Inicia sesión para acceder a tu cuenta';
+    });
+
+    // Validación en tiempo real para login
     emailInput.addEventListener('input', validateEmail);
     passwordInput.addEventListener('input', validatePassword);
     emailInput.addEventListener('blur', validateEmail);
     passwordInput.addEventListener('blur', validatePassword);
 
-    // Envío del formulario
+    // Validación en tiempo real para registro
+    regNameInput.addEventListener('input', validateRegName);
+    regEmailInput.addEventListener('input', validateRegEmail);
+    regPasswordInput.addEventListener('input', validateRegPassword);
+    regConfirmPasswordInput.addEventListener('input', validateRegConfirmPassword);
+    userRoleInput.addEventListener('change', validateUserRole);
+
+    // Envío del formulario de login
     loginForm.addEventListener('submit', handleLogin);
+
+    // Envío del formulario de registro
+    registerForm.addEventListener('submit', handleRegister);
 
     // Botones de redes sociales
     document.querySelector('.google-btn').addEventListener('click', () => socialLogin('Google'));
     document.querySelector('.facebook-btn').addEventListener('click', () => socialLogin('Facebook'));
     document.querySelector('.microsoft-btn').addEventListener('click', () => socialLogin('Microsoft'));
 
-    // Funciones de validación
+    // Funciones de validación para login
     function validateEmail() {
         const email = emailInput.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -58,6 +88,93 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         } else {
             showSuccess(passwordInput, passwordError);
+            return true;
+        }
+    }
+
+    // Funciones de validación para registro
+    function validateRegName() {
+        const name = regNameInput.value.trim();
+        const nameError = document.getElementById('regNameError');
+        
+        if (!name) {
+            showError(regNameInput, nameError, 'El nombre es requerido');
+            return false;
+        } else if (name.length < 2) {
+            showError(regNameInput, nameError, 'El nombre debe tener al menos 2 caracteres');
+            return false;
+        } else {
+            showSuccess(regNameInput, nameError);
+            return true;
+        }
+    }
+
+    function validateRegEmail() {
+        const email = regEmailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailError = document.getElementById('regEmailError');
+        
+        if (!email) {
+            showError(regEmailInput, emailError, 'El correo electrónico es requerido');
+            return false;
+        } else if (!emailRegex.test(email)) {
+            showError(regEmailInput, emailError, 'Ingresa un correo electrónico válido');
+            return false;
+        } else {
+            // Verificar si el email ya existe
+            const users = JSON.parse(localStorage.getItem('wawita_users')) || [];
+            const emailExists = users.some(user => user.email === email);
+            if (emailExists) {
+                showError(regEmailInput, emailError, 'Este correo ya está registrado');
+                return false;
+            }
+            showSuccess(regEmailInput, emailError);
+            return true;
+        }
+    }
+
+    function validateRegPassword() {
+        const password = regPasswordInput.value;
+        const passwordError = document.getElementById('regPasswordError');
+        
+        if (!password) {
+            showError(regPasswordInput, passwordError, 'La contraseña es requerida');
+            return false;
+        } else if (password.length < 6) {
+            showError(regPasswordInput, passwordError, 'La contraseña debe tener al menos 6 caracteres');
+            return false;
+        } else {
+            showSuccess(regPasswordInput, passwordError);
+            return true;
+        }
+    }
+
+    function validateRegConfirmPassword() {
+        const password = regPasswordInput.value;
+        const confirmPassword = regConfirmPasswordInput.value;
+        const confirmPasswordError = document.getElementById('regConfirmPasswordError');
+        
+        if (!confirmPassword) {
+            showError(regConfirmPasswordInput, confirmPasswordError, 'Confirma tu contraseña');
+            return false;
+        } else if (password !== confirmPassword) {
+            showError(regConfirmPasswordInput, confirmPasswordError, 'Las contraseñas no coinciden');
+            return false;
+        } else {
+            showSuccess(regConfirmPasswordInput, confirmPasswordError);
+            return true;
+        }
+    }
+
+    function validateUserRole() {
+        const role = userRoleInput.value;
+        const roleError = document.getElementById('userRoleError');
+        
+        if (!role) {
+            showError(userRoleInput, roleError, 'Selecciona tu tipo de usuario');
+            return false;
+        } else {
+            showSuccess(userRoleInput, roleError);
             return true;
         }
     }
@@ -91,18 +208,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const remember = document.getElementById('remember').checked;
 
         // Mostrar loading
-        setLoading(true);
+        setLoading(loginForm, true);
 
         try {
             // Simular delay de autenticación
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            // Verificar credenciales
+            // Verificar credenciales en localStorage
+            const users = JSON.parse(localStorage.getItem('wawita_users')) || [];
             const user = users.find(u => u.email === email && u.password === password);
             
             if (user) {
                 // Login exitoso
                 const userData = {
+                    id: user.id,
                     email: user.email,
                     name: user.name,
                     role: user.role,
@@ -118,29 +237,97 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Mostrar mensaje de éxito
-                showSuccessMessage('¡Bienvenido! Redirigiendo...');
+                showSuccessMessage(`¡Bienvenido ${user.name}! Redirigiendo...`);
                 
                 // Redirigir después de 1 segundo
                 setTimeout(() => {
-                    window.location.href = 'galeria.html';
+                    window.location.href = 'index.html';
                 }, 1000);
 
             } else {
                 // Credenciales incorrectas
                 showError(emailInput, emailError, 'Credenciales incorrectas');
                 showError(passwordInput, passwordError, 'Verifica tu email y contraseña');
-                setLoading(false);
+                setLoading(loginForm, false);
             }
 
         } catch (error) {
             console.error('Error en el login:', error);
             showError(emailInput, emailError, 'Error del servidor. Intenta nuevamente.');
-            setLoading(false);
+            setLoading(loginForm, false);
         }
     }
 
-    function setLoading(loading) {
-        loginBtn.disabled = loading;
+    // Manejo del registro
+    async function handleRegister(e) {
+        e.preventDefault();
+        
+        const isNameValid = validateRegName();
+        const isEmailValid = validateRegEmail();
+        const isPasswordValid = validateRegPassword();
+        const isConfirmPasswordValid = validateRegConfirmPassword();
+        const isRoleValid = validateUserRole();
+        
+        if (!isNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid || !isRoleValid) {
+            return;
+        }
+
+        const name = regNameInput.value.trim();
+        const email = regEmailInput.value.trim();
+        const password = regPasswordInput.value;
+        const role = userRoleInput.value;
+
+        // Mostrar loading
+        setLoading(registerForm, true);
+
+        try {
+            // Simular delay de registro
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Crear nuevo usuario
+            const users = JSON.parse(localStorage.getItem('wawita_users')) || [];
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                role: role,
+                registrationDate: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('wawita_users', JSON.stringify(users));
+
+            // Mostrar mensaje de éxito
+            showSuccessMessage('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.');
+            
+            // Cambiar al formulario de login después de 2 segundos
+            setTimeout(() => {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                formTitle.textContent = 'Bienvenido a Wawita';
+                formSubtitle.textContent = 'Inicia sesión para acceder a tu cuenta';
+                
+                // Pre-llenar el email en el formulario de login
+                emailInput.value = email;
+                
+                setLoading(registerForm, false);
+                registerForm.reset();
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error en el registro:', error);
+            showError(regEmailInput, document.getElementById('regEmailError'), 'Error del servidor. Intenta nuevamente.');
+            setLoading(registerForm, false);
+        }
+    }
+
+    function setLoading(form, loading) {
+        const btn = form.querySelector('.login-btn');
+        const btnText = btn.querySelector('.btn-text');
+        const btnLoading = btn.querySelector('.btn-loading');
+        
+        btn.disabled = loading;
         if (loading) {
             btnText.style.display = 'none';
             btnLoading.style.display = 'inline-flex';
@@ -168,16 +355,19 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(successDiv);
 
         setTimeout(() => {
-            successDiv.remove();
-        }, 3000);
+            if (successDiv.parentNode) {
+                successDiv.remove();
+            }
+        }, 4000);
     }
 
     // Login con redes sociales (simulado)
     function socialLogin(provider) {
-        setLoading(true);
+        setLoading(loginForm, true);
         
         setTimeout(() => {
             const userData = {
+                id: Date.now(),
                 email: `usuario@${provider.toLowerCase()}.com`,
                 name: `Usuario de ${provider}`,
                 role: 'student',
@@ -189,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showSuccessMessage(`¡Conectado con ${provider}! Redirigiendo...`);
             
             setTimeout(() => {
-                window.location.href = 'galeria.html';
+                window.location.href = 'index.html';
             }, 1000);
         }, 2000);
     }
@@ -203,54 +393,45 @@ document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(savedUser);
             showSuccessMessage(`¡Bienvenido de nuevo, ${userData.name}!`);
             setTimeout(() => {
-                window.location.href = 'galeria.html';
+                window.location.href = 'index.html';
             }, 1500);
         }
     }
 
-    // Mostrar credenciales de demo
-    function showDemoCredentials() {
-        const demoDiv = document.createElement('div');
-        demoDiv.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 121, 107, 0.9);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 12px;
-            max-width: 300px;
-            z-index: 1000;
-        `;
-        demoDiv.innerHTML = `
-            <strong>🔑 Credenciales de Demo:</strong><br>
-            📧 demo@wawita.es<br>
-            🔒 demo123<br>
-            <small style="opacity: 0.8;">Haz clic para cerrar</small>
-        `;
-        
-        demoDiv.addEventListener('click', () => demoDiv.remove());
-        document.body.appendChild(demoDiv);
-
-        setTimeout(() => {
-            if (demoDiv.parentNode) {
-                demoDiv.remove();
-            }
-        }, 10000);
-    }
-
     // Inicializar
     checkExistingSession();
-    
-    // Mostrar credenciales de demo después de 3 segundos
-    setTimeout(showDemoCredentials, 3000);
 });
 
-// Función para alternar visibilidad de contraseña
+// Funciones para alternar visibilidad de contraseña
 function togglePassword() {
     const passwordInput = document.getElementById('password');
-    const toggleBtn = document.querySelector('.toggle-password');
+    const toggleBtn = passwordInput.nextElementSibling;
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleBtn.textContent = '🙈';
+    } else {
+        passwordInput.type = 'password';
+        toggleBtn.textContent = '👁️';
+    }
+}
+
+function toggleRegisterPassword() {
+    const passwordInput = document.getElementById('regPassword');
+    const toggleBtn = passwordInput.nextElementSibling;
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleBtn.textContent = '🙈';
+    } else {
+        passwordInput.type = 'password';
+        toggleBtn.textContent = '👁️';
+    }
+}
+
+function toggleConfirmPassword() {
+    const passwordInput = document.getElementById('regConfirmPassword');
+    const toggleBtn = passwordInput.nextElementSibling;
     
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
